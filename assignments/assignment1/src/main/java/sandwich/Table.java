@@ -51,17 +51,11 @@ public class Table {
     public synchronized void eat(Chef chef){
 
 
-        while(ingredients.size() == 0 && count >= MAX){
+        while(ingredients.size() == 0 || count >= MAX){
             //table is empty or contains the ingredient
 
 
             try{
-
-                //just in case there are loose threads
-                if(count >= MAX){
-                    return;
-                }
-
                 wait();
             } catch (Exception e) {
                 e.printStackTrace();
