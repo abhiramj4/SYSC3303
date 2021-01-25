@@ -15,7 +15,7 @@ public class Table {
     public Table(){
         this.ingredients = new ArrayList<Ingredient>();
         this.count = 0;
-        this.MAX = 3;
+        this.MAX = 50;
     }
 
     /**
@@ -53,9 +53,15 @@ public class Table {
 
         while(ingredients.size() == 0 || count >= MAX){
             //table is empty or contains the ingredient
-
+            //just in case there are loose threads
+            if(count >= MAX){
+                return;
+            }
 
             try{
+
+
+
                 wait();
             } catch (Exception e) {
                 e.printStackTrace();
