@@ -15,7 +15,7 @@ public class Table {
     public Table(){
         this.ingredients = new ArrayList<Ingredient>();
         this.count = 0;
-        this.MAX = 30;
+        this.MAX = 10;
     }
 
     /**
@@ -43,10 +43,18 @@ public class Table {
 
     }
 
+    /**
+     * Chef can make the sandwich and eat it
+     * @param chef chef that is eating the sandwich
+     */
     public synchronized void eat(Chef chef){
 
+        //failsafe in case something goes wrong
+        if(count >= MAX){
+            return;
+        }
 
-        while(ingredients.size() == 0 || count >= MAX){
+        while(ingredients.size() == 0){
             //table is empty or contains the ingredient
             //just in case there are loose threads
 
