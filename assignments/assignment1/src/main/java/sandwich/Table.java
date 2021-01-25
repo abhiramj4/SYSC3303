@@ -15,7 +15,7 @@ public class Table {
     public Table(){
         this.ingredients = new ArrayList<Ingredient>();
         this.count = 0;
-        this.MAX = 50;
+        this.MAX = 30;
     }
 
     /**
@@ -25,11 +25,6 @@ public class Table {
      */
     public synchronized void eatingTime(Ingredient ingredientOne, Ingredient ingredientTwo){
 
-        //stops the agent from putting on too much, just in case
-        if(count >= MAX){
-            notifyAll();
-            return;
-        }
 
         while(ingredients.size() > 0){
             //wait while the table has some stuff on it
@@ -54,9 +49,7 @@ public class Table {
         while(ingredients.size() == 0 || count >= MAX){
             //table is empty or contains the ingredient
             //just in case there are loose threads
-            if(count >= MAX){
-                return;
-            }
+
 
             try{
 

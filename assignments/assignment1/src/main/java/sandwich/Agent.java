@@ -17,12 +17,8 @@ public class Agent extends Thread{
     public void run() {
 
 
-        while(true) {
+        while(this.table.getCount() != this.table.getMax()) {
             //get random ingredient
-
-            if(this.table.getCount() == this.table.getMax()){
-                break;
-            }
 
             Ingredient first = Ingredient.getRandomIngredient();
             Ingredient second = Ingredient.getRandomIngredient();
