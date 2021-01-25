@@ -58,11 +58,7 @@ public class Table {
             //table is empty or contains the ingredient
             //just in case there are loose threads
 
-
             try{
-
-
-
                 wait();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -70,8 +66,8 @@ public class Table {
             }
         }
 
-        System.out.println(chef.getName() + " has made a sandwich!");
         clearTable();
+        System.out.println(chef.getName() + " has made a sandwich!");
         count++;
         System.out.println("count is now " + count);
 
