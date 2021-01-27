@@ -27,13 +27,13 @@ public class Chef extends Thread {
 
 
 
-                if (!table.getIngredients().contains(this.ingredient)) {
+
                     this.table.eat(this);
 
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {}
-                }
+
 
 
 

@@ -15,7 +15,7 @@ public class Table {
     public Table(){
         this.ingredients = new ArrayList<Ingredient>();
         this.count = 0;
-        this.MAX = 10;
+        this.MAX = 1;
     }
 
     /**
@@ -26,8 +26,10 @@ public class Table {
     public synchronized void eatingTime(Ingredient ingredientOne, Ingredient ingredientTwo){
 
 
+
         while(ingredients.size() > 0){
             //wait while the table has some stuff on it
+
             try{
                 wait();
             } catch (InterruptedException e){
@@ -35,9 +37,12 @@ public class Table {
             }
         }
 
-        //add items to table
-        for (Ingredient ingredient : Arrays.asList(ingredientOne, ingredientTwo)) addIngredient(ingredient);
+        if(count >= MAX){
+            return;
+        }
 
+        for (Ingredient ingredient : Arrays.asList(ingredientOne, ingredientTwo)) addIngredient(ingredient);
+        System.out.println("Placed items "+ ingredientOne + " " + ingredientTwo + " \n");
 
         notifyAll();
 
@@ -49,16 +54,16 @@ public class Table {
      */
     public synchronized void eat(Chef chef){
 
-        //failsafe in case something goes wrong
-        if(count >= MAX){
-            return;
-        }
-
-        while(ingredients.size() == 0){
+        while(ingredients.size() == 0 || ingredients.contains(chef.getIngredient())){
             //table is empty or contains the ingredient
             //just in case there are loose threads
 
+            if(count >= MAX){
+                return;
+            }
+
             try{
+
                 wait();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -66,10 +71,12 @@ public class Table {
             }
         }
 
+
+
         clearTable();
         System.out.println(chef.getName() + " has made a sandwich!");
         count++;
-        System.out.println("count is now " + count);
+        System.out.println("count is now " + count + "\n");
 
         notifyAll();
     }
