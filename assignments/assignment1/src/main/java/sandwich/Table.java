@@ -15,7 +15,7 @@ public class Table {
     public Table(){
         this.ingredients = new ArrayList<Ingredient>();
         this.count = 0;
-        this.MAX = 1;
+        this.MAX = 10;
     }
 
     /**
@@ -27,7 +27,7 @@ public class Table {
 
 
 
-        while(ingredients.size() > 0){
+        while(!ingredients.isEmpty()){
             //wait while the table has some stuff on it
 
             try{
@@ -37,9 +37,6 @@ public class Table {
             }
         }
 
-        if(count >= MAX){
-            return;
-        }
 
         for (Ingredient ingredient : Arrays.asList(ingredientOne, ingredientTwo)) addIngredient(ingredient);
         System.out.println("Placed items "+ ingredientOne + " " + ingredientTwo + " \n");

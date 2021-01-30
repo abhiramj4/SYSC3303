@@ -28,6 +28,10 @@ public class Agent extends Thread{
             }
 
             this.table.eatingTime(first, second);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
 
         }
 
