@@ -15,7 +15,7 @@ public class Table {
     public Table(){
         this.ingredients = new ArrayList<Ingredient>();
         this.count = 0;
-        this.MAX = 10;
+        this.MAX = 3;
     }
 
     /**
@@ -24,7 +24,6 @@ public class Table {
      * @param ingredientTwo seccond ingredient placed
      */
     public synchronized void eatingTime(Ingredient ingredientOne, Ingredient ingredientTwo){
-
 
         while(ingredients.size() > 0){
             //wait while the table has some stuff on it
@@ -38,7 +37,6 @@ public class Table {
         //add items to table
         for (Ingredient ingredient : Arrays.asList(ingredientOne, ingredientTwo)) addIngredient(ingredient);
 
-
         notifyAll();
 
     }
@@ -49,14 +47,8 @@ public class Table {
      */
     public synchronized void eat(Chef chef){
 
-        //failsafe in case something goes wrong
-        if(count >= MAX){
-            return;
-        }
-
-        while(ingredients.size() == 0){
+        while(ingredients.size() == 0 || ingredients.contains(chef.getIngredient())){
             //table is empty or contains the ingredient
-            //just in case there are loose threads
 
             try{
                 wait();
@@ -78,7 +70,7 @@ public class Table {
      * get ingredients list
      * @return ingredients list
      */
-    public synchronized ArrayList<Ingredient> getIngredients() {
+    public ArrayList<Ingredient> getIngredients() {
         return ingredients;
     }
 

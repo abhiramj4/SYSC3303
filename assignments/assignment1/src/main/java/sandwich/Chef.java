@@ -12,7 +12,7 @@ public class Chef extends Thread {
 
     }
 
-    public Ingredient getIngredient(){
+    public Ingredient getIngredient() {
         return ingredient;
     }
 
@@ -22,23 +22,18 @@ public class Chef extends Thread {
     public void run() {
 
 
+        while (this.table.getCount() <= this.table.getMax()) {
 
-        while (this.table.getCount() < this.table.getMax()) {
+            this.table.eat(this);
 
-
-
-                if (!table.getIngredients().contains(this.ingredient)) {
-                    this.table.eat(this);
-
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {}
-                }
-
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
 
         }
-
 
 
     }
