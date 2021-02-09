@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
 
@@ -22,7 +23,7 @@ public class Client {
         // Prepare a DatagramPacket and send it via sendReceiveSocket
         // to port 5000 on the destination host.
 
-        String s = "Anyone there?";
+        String s = "test.txt";
         System.out.println("Client: sending a packet containing:\n" + s);
 
         // Java stores characters as 16-bit Unicode values, but
@@ -31,7 +32,31 @@ public class Client {
         // default character encoding, storing the result into a new
         // byte array.
 
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        outputStream.write(01);
+
+
         byte msg[] = s.getBytes();
+        try {
+            outputStream.write(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        outputStream.write(0);
+
+        String stringMode = "netascii";
+        byte mode[] = stringMode.getBytes();
+
+        try {
+            outputStream.write(mode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        outputStream.write(0);
+
+        byte[] finalMessage = outputStream.toByteArray();
 
         // Construct a datagram packet that is to be sent to a specified port
         // on a specified host.
@@ -46,7 +71,7 @@ public class Client {
         //     address of the local host.
         //  5000 - the destination port number on the destination host.
         try {
-            sendPacket = new DatagramPacket(msg, msg.length,
+            sendPacket = new DatagramPacket(finalMessage, finalMessage.length,
                     InetAddress.getLocalHost(), 5000);
         } catch (UnknownHostException e) {
             e.printStackTrace();
