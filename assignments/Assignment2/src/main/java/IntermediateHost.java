@@ -13,9 +13,9 @@ public class IntermediateHost {
             // Construct a datagram socket and bind it to any available
             // port on the local host machine. This socket will be used to
             // send UDP Datagram packets.
-            sendSocket = new DatagramSocket(69);
+            sendSocket = new DatagramSocket();
 
-            // Construct a datagram socket and bind it to port 5000
+            // Construct a datagram socket and bind it to port 23
             // on the local host machine. This socket will be used to
             // receive UDP Datagram packets.
             receiveSocket = new DatagramSocket(23);
@@ -94,7 +94,7 @@ public class IntermediateHost {
 
         //goes to the actual server
         sendPacket = new DatagramPacket(data, receivePacket.getLength(),
-                receivePacket.getAddress(), receivePacket.getPort());
+                receivePacket.getAddress(), 69);
 
         System.out.println( "Intermediate: Sending packet:");
         System.out.println("To host: " + sendPacket.getAddress());

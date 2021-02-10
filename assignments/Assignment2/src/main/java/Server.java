@@ -17,10 +17,10 @@ public class Server {
             // send UDP Datagram packets.
             sendSocket = new DatagramSocket();
 
-            // Construct a datagram socket and bind it to port 5000
+            // Construct a datagram socket and bind it to port 69
             // on the local host machine. This socket will be used to
             // receive UDP Datagram packets.
-            receiveSocket = new DatagramSocket(5000);
+            receiveSocket = new DatagramSocket(69);
 
             // to test socket timeout (2 seconds)
             //receiveSocket.setSoTimeout(2000);
@@ -74,7 +74,7 @@ public class Server {
 
 
             sendPacket = new DatagramPacket(readMsg, receivePacket.getLength(),
-                    receivePacket.getAddress(), receivePacket.getPort());
+                    receivePacket.getAddress(), 23);
 
         } else {
 
