@@ -33,7 +33,8 @@ public class Client {
         // byte array.
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(01);
+        outputStream.write(0);
+        outputStream.write(1);
 
 
         byte msg[] = s.getBytes();
@@ -72,7 +73,7 @@ public class Client {
         //  5000 - the destination port number on the destination host.
         try {
             sendPacket = new DatagramPacket(finalMessage, finalMessage.length,
-                    InetAddress.getLocalHost(), 5000);
+                    InetAddress.getLocalHost(), 23);
         } catch (UnknownHostException e) {
             e.printStackTrace();
             System.exit(1);
