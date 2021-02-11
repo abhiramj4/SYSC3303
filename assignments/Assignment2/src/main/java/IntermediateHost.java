@@ -94,15 +94,17 @@ public class IntermediateHost {
 
         //goes to the actual server
 
-        if(receivePacket.getPort() == 69){
-            //packet came from the server and needs to go to the client at 8080.
-            sendPacket = new DatagramPacket(data, receivePacket.getLength(),
-                    receivePacket.getAddress(), 8080);
-        } else {
+        if(receivePacket.getPort() == 8080){
+            //packet came from the client and needs to go to the server.
+
             sendPacket = new DatagramPacket(data, receivePacket.getLength(),
                     receivePacket.getAddress(), 69);
 
-            //packet is going to the server.
+        } else {
+            //packet came from the server.
+            sendPacket = new DatagramPacket(data, receivePacket.getLength(),
+                    receivePacket.getAddress(), 8080);
+
         }
 
 

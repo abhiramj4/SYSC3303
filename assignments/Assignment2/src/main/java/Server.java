@@ -79,7 +79,7 @@ public class Server {
             textOutputStream.reset();
 
 
-            for(int i = textOutput.length + 2; i < data.length; i++){
+            for(int i = textOutput.length + 3; i < data.length; i++){
                 if(data[i] == 0){
                     break;
                 } else {
@@ -99,7 +99,7 @@ public class Server {
             byte[] readMsg = outputStream.toByteArray();
 
 
-            sendPacket = new DatagramPacket(readMsg, receivePacket.getLength(),
+            sendPacket = new DatagramPacket(readMsg, readMsg.length,
                     receivePacket.getAddress(), 23);
 
         } else {
@@ -116,8 +116,8 @@ public class Server {
 
             byte[] writeMsg = outputStream.toByteArray();
 
-            sendPacket = new DatagramPacket(writeMsg, receivePacket.getLength(),
-                    receivePacket.getAddress(), receivePacket.getPort());
+            sendPacket = new DatagramPacket(writeMsg, writeMsg.length,
+                    receivePacket.getAddress(), 23);
 
         }
 
@@ -180,9 +180,6 @@ public class Server {
 
         System.out.println("Server: packet sent");
 
-        // We're finished, so close the sockets.
-        sendSocket.close();
-        receiveSocket.close();
     }
 
 
