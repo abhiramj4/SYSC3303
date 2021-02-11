@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 
 public class Server {
 
@@ -61,8 +62,33 @@ public class Server {
         if(data[0] == 0 && data[1] == 1){
             //read request
             System.out.println("read request: " );
-            System.out.println("text content: " );
-            System.out.println("Mode: ");
+
+            ByteArrayOutputStream textOutputStream = new ByteArrayOutputStream();
+
+            //convert bytes into string
+            for(int i = 2; i < data.length; i++){
+                if(data[i] == 0){
+                    break;
+                } else {
+                    textOutputStream.write(data[i]);
+                }
+            }
+            byte[] textOutput = textOutputStream.toByteArray();
+            String textContent = new String(textOutput, StandardCharsets.UTF_8);
+            System.out.println("text content: "+ textContent);
+            textOutputStream.reset();
+
+
+            for(int i = textOutput.length + 2; i < data.length; i++){
+                if(data[i] == 0){
+                    break;
+                } else {
+                    textOutputStream.write(data[i]);
+                }
+            }
+            byte[] modeOutput = textOutputStream.toByteArray();
+            String mode = new String(modeOutput, StandardCharsets.UTF_8);
+            System.out.println("Mode: " + mode);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(0);
