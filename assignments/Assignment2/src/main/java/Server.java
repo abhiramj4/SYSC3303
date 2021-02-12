@@ -58,53 +58,46 @@ public class Server {
         System.out.println("Length: " + len);
         System.out.print("Containing: " );
 
+        ByteArrayOutputStream textOutputStream = new ByteArrayOutputStream();
+
+        //convert bytes into string
+        for(int i = 2; i < data.length; i++){
+            if(data[i] == 0){
+                break;
+            } else {
+                textOutputStream.write(data[i]);
+            }
+        }
+        byte[] textOutput = textOutputStream.toByteArray();
+        String textContent = new String(textOutput, StandardCharsets.UTF_8);
+        System.out.println("text content: "+ textContent);
+        textOutputStream.reset();
+
+
+        for(int i = textOutput.length + 3; i < data.length; i++){
+            if(data[i] == 0){
+                break;
+            } else {
+                textOutputStream.write(data[i]);
+            }
+        }
+        byte[] modeOutput = textOutputStream.toByteArray();
+        String mode = new String(modeOutput, StandardCharsets.UTF_8);
+        System.out.println("Mode: " + mode);
+
 
         if(data[0] == 0 && data[1] == 1){
             //read request
             System.out.println("read request: " );
 
-            ByteArrayOutputStream textOutputStream = new ByteArrayOutputStream();
 
-            //convert bytes into string
-            for(int i = 2; i < data.length; i++){
-                if(data[i] == 0){
-                    break;
-                } else {
-                    textOutputStream.write(data[i]);
-                }
-            }
-            byte[] textOutput = textOutputStream.toByteArray();
-            String textContent = new String(textOutput, StandardCharsets.UTF_8);
-            System.out.println("text content: "+ textContent);
-            textOutputStream.reset();
-
-
-            for(int i = textOutput.length + 3; i < data.length; i++){
-                if(data[i] == 0){
-                    break;
-                } else {
-                    textOutputStream.write(data[i]);
-                }
-            }
-            byte[] modeOutput = textOutputStream.toByteArray();
-            String mode = new String(modeOutput, StandardCharsets.UTF_8);
-            System.out.println("Mode: " + mode);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            if(data[0] == 0 && data[1] == 1){
-                outputStream.write(0);
-                outputStream.write(3);
-                outputStream.write(0);
-                outputStream.write(1);
-            } else {
-                outputStream.write(0);
-                outputStream.write(4);
-                outputStream.write(0);
-                outputStream.write(0);
-            }
 
-
-
+            outputStream.write(0);
+            outputStream.write(3);
+            outputStream.write(0);
+            outputStream.write(1);
 
             byte[] readMsg = outputStream.toByteArray();
 
@@ -144,30 +137,6 @@ public class Server {
             e.printStackTrace();
             System.exit(1);
         }
-
-        // Create a new datagram packet containing the string received from the client.
-
-        // Construct a datagram packet that is to be sent to a specified port
-        // on a specified host.
-        // The arguments are:
-        //  data - the packet data (a byte array). This is the packet data
-        //         that was received from the client.
-        //  receivePacket.getLength() - the length of the packet data.
-        //    Since we are echoing the received packet, this is the length
-        //    of the received packet's data.
-        //    This value is <= data.length (the length of the byte array).
-        //  receivePacket.getAddress() - the Internet address of the
-        //     destination host. Since we want to send a packet back to the
-        //     client, we extract the address of the machine where the
-        //     client is running from the datagram that was sent to us by
-        //     the client.
-        //  receivePacket.getPort() - the destination port number on the
-        //     destination host where the client is running. The client
-        //     sends and receives datagrams through the same socket/port,
-        //     so we extract the port that the client used to send us the
-        //     datagram, and use that as the destination port for the echoed
-        //     packet.
-
 
 
         System.out.println( "Server: Sending packet:");

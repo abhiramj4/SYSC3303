@@ -68,30 +68,6 @@ public class IntermediateHost {
             System.exit(1);
         }
 
-        // Create a new datagram packet containing the string received from the client.
-
-        // Construct a datagram packet that is to be sent to a specified port
-        // on a specified host.
-        // The arguments are:
-        //  data - the packet data (a byte array). This is the packet data
-        //         that was received from the client.
-        //  receivePacket.getLength() - the length of the packet data.
-        //    Since we are echoing the received packet, this is the length
-        //    of the received packet's data.
-        //    This value is <= data.length (the length of the byte array).
-        //  receivePacket.getAddress() - the Internet address of the
-        //     destination host. Since we want to send a packet back to the
-        //     client, we extract the address of the machine where the
-        //     client is running from the datagram that was sent to us by
-        //     the client.
-        //  receivePacket.getPort() - the destination port number on the
-        //     destination host where the client is running. The client
-        //     sends and receives datagrams through the same socket/port,
-        //     so we extract the port that the client used to send us the
-        //     datagram, and use that as the destination port for the echoed
-        //     packet.
-
-
         //goes to the actual server
 
         if(receivePacket.getPort() == 8080){
@@ -128,9 +104,7 @@ public class IntermediateHost {
 
         System.out.println("Intermediate: packet sent");
 
-        // We're finished, so close the sockets.
-        /*sendSocket.close();
-        receiveSocket.close();*/
+
     }
 
     public static void main( String args[] ) {

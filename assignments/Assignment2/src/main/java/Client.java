@@ -34,7 +34,7 @@ public class Client {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        for(int i = 0; i < 14; i++){
+        for(int i = 0; i < 2; i++){
 
             //alternate between read and write requests.
             outputStream.write(0);
@@ -95,19 +95,14 @@ public class Client {
 
             System.out.println("Client: Packet sent.\n");
 
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e ) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-
 
             // Construct a DatagramPacket for receiving packets up
             // to 100 bytes long (the length of the byte array).
 
             byte data[] = new byte[100];
             receivePacket = new DatagramPacket(data, data.length);
+
+            outputStream.reset(); // reset output stream
 
             try {
                 // Block until a datagram is received via sendReceiveSocket.
