@@ -91,10 +91,20 @@ public class Server {
             System.out.println("Mode: " + mode);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(0);
-            outputStream.write(3);
-            outputStream.write(0);
-            outputStream.write(1);
+            if(data[0] == 0 && data[1] == 1){
+                outputStream.write(0);
+                outputStream.write(3);
+                outputStream.write(0);
+                outputStream.write(1);
+            } else {
+                outputStream.write(0);
+                outputStream.write(4);
+                outputStream.write(0);
+                outputStream.write(0);
+            }
+
+
+
 
             byte[] readMsg = outputStream.toByteArray();
 
@@ -183,8 +193,7 @@ public class Server {
     }
 
 
-    public static void main( String args[] )
-    {
+    public static void main( String args[] ) {
         Server s = new Server();
         while(true){
             s.receiveAndEcho();
