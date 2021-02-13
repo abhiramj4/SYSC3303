@@ -36,6 +36,8 @@ public class Server {
         // to 100 bytes long (the length of the byte array).
 
         byte data[] = new byte[100];
+        byte returnMessage[] = new byte[4];
+
         receivePacket = new DatagramPacket(data, data.length);
         System.out.println("Server: Waiting for Packet.\n");
 
@@ -88,43 +90,30 @@ public class Server {
 
         if(data[0] == 0 && data[1] == 1){
             //read request
-            System.out.println("read request: " );
+            System.out.println("read request" );
 
 
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            returnMessage[0] = 0;
+            returnMessage[1] = 3;
+            returnMessage[2] = 0;
+            returnMessage[3] = 1;
 
-            outputStream.write(0);
-            outputStream.write(3);
-            outputStream.write(0);
-            outputStream.write(1);
-
-            byte[] readMsg = outputStream.toByteArray();
-
-
-            sendPacket = new DatagramPacket(readMsg, readMsg.length,
-                    receivePacket.getAddress(), 23);
 
         } else {
 
             //write request
-            System.out.println("write request: " );
-            System.out.println("text content: " );
-            System.out.println("Mode: ");
+            System.out.println("write request" );
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(0);
-            outputStream.write(4);
-            outputStream.write(0);
-            outputStream.write(0);
-
-            byte[] writeMsg = outputStream.toByteArray();
-
-            sendPacket = new DatagramPacket(writeMsg, writeMsg.length,
-                    receivePacket.getAddress(), 23);
+            returnMessage[0] = 0;
+            returnMessage[1] = 4;
+            returnMessage[2] = 0;
+            returnMessage[3] = 0;
 
         }
 
+        sendPacket = new DatagramPacket(returnMessage, returnMessage.length,
+                receivePacket.getAddress(), 23);
 
 
         // Form a String from the byte array.
@@ -146,7 +135,7 @@ public class Server {
         len = sendPacket.getLength();
         System.out.println("Length: " + len);
         System.out.print("Containing: ");
-        System.out.println(new String(sendPacket.getData(),0,len));
+
         // or (as we should be sending back the same thing)
         // System.out.println(received);
 

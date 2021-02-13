@@ -54,11 +54,7 @@ public class IntermediateHost {
         System.out.println("Host port: " + receivePacket.getPort());
         int len = receivePacket.getLength();
         System.out.println("Length: " + len);
-        System.out.print("Containing: " );
 
-        // Form a String from the byte array.
-        String received = new String(data,0,len);
-        System.out.println(received + "\n");
 
         // Slow things down (wait 5 seconds)
         try {
@@ -89,8 +85,7 @@ public class IntermediateHost {
         System.out.println("Destination host port: " + sendPacket.getPort());
         len = sendPacket.getLength();
         System.out.println("Length: " + len);
-        System.out.print("Containing: ");
-        System.out.println(new String(sendPacket.getData(),0,len));
+
         // or (as we should be sending back the same thing)
         // System.out.println(received);
 

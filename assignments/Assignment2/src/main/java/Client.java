@@ -21,18 +21,15 @@ public class Client {
         }
     }
 
+    /**
+     * Send and receive packets through the sendReceiveSocket.
+     */
     public void sendAndReceive() {
         // Prepare a DatagramPacket and send it via sendReceiveSocket
         // to port 5000 on the destination host.
 
         String s = "test.txt";
         System.out.println("Client: sending a packet containing:\n" + s);
-
-        // Java stores characters as 16-bit Unicode values, but
-        // DatagramPackets store their messages as byte arrays.
-        // Convert the String into bytes according to the platform's
-        // default character encoding, storing the result into a new
-        // byte array.
 
         byte request[];
         byte finalMessage[];
@@ -81,8 +78,16 @@ public class Client {
             System.out.println("Destination host port: " + sendPacket.getPort());
             int len = sendPacket.getLength();
             System.out.println("Length: " + len);
-            System.out.print("Containing: ");
-            System.out.println(new String(sendPacket.getData(),0,len)); // or could print "s"
+            System.out.println("Containing: ");
+
+            if (request[1] == 1){
+                System.out.println("Read request");
+            } else {
+                System.out.println("Write request");
+            }
+
+            System.out.println(s);
+            System.out.println(stringMode);
 
             // Send the datagram packet to the server via the send/receive socket.
 
@@ -103,7 +108,7 @@ public class Client {
             receivePacket = new DatagramPacket(data, data.length);
 
 
-            finalMessage = null;
+
 
 
             try {
@@ -123,9 +128,14 @@ public class Client {
             System.out.println("Length: " + len);
             System.out.print("Containing: ");
 
-            // Form a String from the byte array.
-            String received = new String(data,0,len);
-            System.out.println(received);
+
+            if(data[1] == 3){
+                System.out.println("Valid read request met");
+            } else if (data[1] == 4){
+                System.out.println("Valid write request met");
+            } else {
+                System.out.println("Error from server");
+            }
 
         }
 
