@@ -1,6 +1,8 @@
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
+import java.util.*;
+
 
 public class Client {
 
@@ -32,41 +34,39 @@ public class Client {
         // default character encoding, storing the result into a new
         // byte array.
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte request[];
+        byte finalMessage[];
+        byte zero[] = new byte[1];
+        zero[0] = 0;
 
         for(int i = 0; i < 2; i++){
 
             //alternate between read and write requests.
-            outputStream.write(0);
+            request =  new byte[2];
+
+            request[0] = 0;
             if(i % 2 == 0){
                 //even number
-                outputStream.write(1);
+
+                request[1] = 1;
             } else {
-                outputStream.write(2);
+
+                request[1] = 2;
             }
 
 
-            byte msg[] = s.getBytes();
-            try {
-                outputStream.write(msg);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            outputStream.write(0);
+            byte stringMessage[] = s.getBytes();
 
             String stringMode = "netascii";
             byte mode[] = stringMode.getBytes();
 
-            try {
-                outputStream.write(mode);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            finalMessage = new byte[20];
 
-            outputStream.write(0);
+            System.arraycopy(request, 0, finalMessage, 0, request.length);
+            System.arraycopy(stringMessage,0,finalMessage,request.length,stringMessage.length);
+            System.arraycopy(zero,0, finalMessage, stringMessage.length + 2, zero.length);
+            System.arraycopy(mode,0,finalMessage,stringMessage.length + 3,mode.length);
 
-            byte[] finalMessage = outputStream.toByteArray();
 
             try {
                 sendPacket = new DatagramPacket(finalMessage, finalMessage.length,
@@ -102,7 +102,9 @@ public class Client {
             byte data[] = new byte[100];
             receivePacket = new DatagramPacket(data, data.length);
 
-            outputStream.reset(); // reset output stream
+
+            finalMessage = null;
+
 
             try {
                 // Block until a datagram is received via sendReceiveSocket.

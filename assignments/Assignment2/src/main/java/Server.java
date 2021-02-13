@@ -107,6 +107,7 @@ public class Server {
 
         } else {
 
+            //write request
             System.out.println("write request: " );
             System.out.println("text content: " );
             System.out.println("Mode: ");
