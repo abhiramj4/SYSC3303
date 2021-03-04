@@ -143,6 +143,8 @@ public class Client {
         sendReceiveSocket.close();
     }
 
+    public void rpcSend(){}
+
     public static void main(String args[]) {
         Client c = new Client();
         c.sendAndReceive();

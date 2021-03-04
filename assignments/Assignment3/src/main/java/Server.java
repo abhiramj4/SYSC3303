@@ -27,6 +27,10 @@ public class Server {
         }
     }
 
+    public void rpcSend(){
+
+    }
+
     /**
      * Receive and send back to intermediateHost
      */
