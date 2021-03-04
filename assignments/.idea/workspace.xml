@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e4eddf9-1d83-4ca2-bf75-8bfaabad1fa3" name="Default Changelist" comment="" />
+    <list default="true" id="9e5c9eba-2674-4478-a4a0-9e11e4eaf213" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/MidtermPrep.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/src/Box.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/src/MultiBox.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MidtermPrep/src/MyStack.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectId" id="1nDS6IWrFJeSSaYJD0MHCuxSnPi" />
+  <component name="ProjectId" id="1pGwteX75HHrESwvVwXTGMGMRJw" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -25,70 +29,15 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/assignment1" />
-  </component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Abhiram\Desktop\Abhi\School\SYSC3303\ass" />
-    </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="Assignment1" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="WORKING_DIRECTORY" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="Assignment1" />
-      <option name="filePath" />
-      <option name="vmParameters" />
-      <option name="alternativeJrePath" />
-      <option name="programParameters" />
-      <option name="passParentEnvs" value="true" />
-      <option name="workingDirectory" />
-      <option name="isAlternativeJrePathEnabled" value="false" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="WORKING_DIRECTORY" />
-      <option name="filePath" />
-      <option name="vmParameters" />
-      <option name="alternativeJrePath" />
-      <option name="programParameters" />
-      <option name="passParentEnvs" value="true" />
-      <option name="workingDirectory" />
-      <option name="isAlternativeJrePathEnabled" value="false" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="WORKING_DIRECTORY" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="1e4eddf9-1d83-4ca2-bf75-8bfaabad1fa3" name="Default Changelist" comment="" />
-      <created>1610922993287</created>
+      <changelist id="9e5c9eba-2674-4478-a4a0-9e11e4eaf213" name="Default Changelist" comment="" />
+      <created>1614822953423</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1610922993287</updated>
+      <updated>1614822953423</updated>
     </task>
     <servers />
   </component>
