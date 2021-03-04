@@ -4,8 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The way that this class now works is that the intermediateHost program spawns 2 threads, each with two
@@ -22,10 +21,13 @@ public class IntermediateHost extends Thread {
 
     DatagramPacket sendPacket, receivePacket;
     DatagramSocket sendSocket, receiveSocket;
+    DatagramSocket sendReceiveSocket;
+    private int port;
+    private int destinationPort;
 
-    private List packetQueue = new LinkedList<DatagramPacket>();
+    private Queue packetQueue;
 
-    public IntermediateHost(int port){
+    public IntermediateHost(int port, int destinationPort){
         try {
             // Construct a datagram socket and bind it to any available
             // port on the local host machine
@@ -34,6 +36,14 @@ public class IntermediateHost extends Thread {
             // Construct a datagram socket and bind it to the input port
             // on the local host machine
             receiveSocket = new DatagramSocket(port);
+
+            sendReceiveSocket = new DatagramSocket(port);
+
+
+
+            packetQueue = (Queue) Collections.synchronizedCollection(new LinkedList<DatagramPacket>());
+            this.port = port;
+            //packetQueue = new LinkedList<DatagramPacket>();
 
         } catch (SocketException se) {
             se.printStackTrace();
@@ -167,21 +177,106 @@ public class IntermediateHost extends Thread {
     /**
      * reply to server or client
      */
-    public synchronized void rpcReply(){
+    public synchronized void rpcRecieve(){
+
+        byte data[] = new byte[100];
+        receivePacket = new DatagramPacket(data, data.length);
+
+        try {
+            // Block until a datagram is received via sendReceiveSocket
+            System.out.println("Waiting..."); // waiting
+            sendReceiveSocket.receive(receivePacket);
+        } catch(IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        // Process the received datagram
+        System.out.println("Intermediate: Packet received:");
+        System.out.println("From host: " + receivePacket.getAddress());
+        System.out.println("Host port: " + receivePacket.getPort());
+        int len = receivePacket.getLength();
+        System.out.println("Length: " + len);
+
+        packetQueue.add(receivePacket); //add packet to queue in safe method
+
+        byte ackData[] = new byte[100];
+
+        sendPacket = new DatagramPacket(ackData, receivePacket.getLength(),
+                receivePacket.getAddress(), destinationPort);
+
+        try {
+            sendSocket.send(sendPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        System.out.println("Intermediate: packet sent");
+        System.out.println("");
+
+    }
+
+    public synchronized void rpcSend(){
+
+        if(((DatagramPacket)packetQueue.peek()).getPort() == 8081){
+            //if the packet in the queue comes from another port it is intended for the client
+            byte data[] = new byte[100];
+
+            sendPacket = new DatagramPacket(data, receivePacket.getLength(),
+                    receivePacket.getAddress(), destinationPort);
+
+            if(data[1] == 3){
+                System.out.println("Valid read request met");
+            } else if (data[1] == 4){
+                System.out.println("Valid write request met");
+            } else {
+                System.out.println("Error from server");
+            }
+
+            System.out.print("as bytes: ");
+            for(int i = 0; i < data.length; i++){
+                System.out.print(data[i] + " ");
+            }
+
+            System.out.println(" \n");
+
+            System.out.println( "Intermediate: Sending packet:");
+            System.out.println("To host: " + sendPacket.getAddress());
+            System.out.println("Destination host port: " + sendPacket.getPort());
+            int len = sendPacket.getLength();
+            System.out.println("Length: " + len);
+
+            // Send the datagram packet to the client via the send socket
+            try {
+                sendSocket.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+            System.out.println("Intermediate: packet sent");
+            System.out.println("");
+
+        }
+
+        //else just end and go back to receiving.
+
 
     }
 
     @Override
     public void run(){
         while(true){
-            rpcReply();
+            rpcRecieve();
+            rpcSend();
         }
 
     }
 
     public static void main(String args[]) {
-        IntermediateHost clientHost = new IntermediateHost(23);
-        IntermediateHost serverHost = new IntermediateHost(35);
+        IntermediateHost clientHost = new IntermediateHost(23, 8080);
+        IntermediateHost serverHost = new IntermediateHost(35, 8081);
 
         clientHost.start();
         serverHost.start();
