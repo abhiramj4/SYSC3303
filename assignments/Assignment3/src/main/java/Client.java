@@ -9,6 +9,7 @@ public class Client {
     DatagramPacket sendPacket, receivePacket;
     DatagramSocket sendReceiveSocket;
 
+
     public Client(){
         try {
             // Construct a datagram socket and bind it to any available
@@ -17,11 +18,14 @@ public class Client {
 
             //the client has a receive and send socket of 8080.
             sendReceiveSocket = new DatagramSocket(8080);
+
         } catch (SocketException se) {   // Can't create the socket.
             se.printStackTrace();
             System.exit(1);
         }
     }
+
+    public void rpcSend(Object data){}
 
     /**
      * Send and receive packets through the sendReceiveSocket - sends to the intermediate host at port 23
@@ -145,6 +149,7 @@ public class Client {
 
     public static void main(String args[]) {
         Client c = new Client();
+
         c.sendAndReceive();
     }
 }

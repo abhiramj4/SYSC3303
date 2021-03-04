@@ -4,27 +4,44 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
 
-public class IntermediateHost {
+/**
+ * The way that this class now works is that the intermediateHost program spawns 2 threads, each with two
+ * different ports. Port 23 handles requests from the client and port 35 handles requests coming from the server
+ *
+ * The "run" of each thread continuously listens for requests from their respective clients, and upon receiving
+ * a packet, they will send back an acknowledge packet. IntermediateHost will implement a synchronized queue that the
+ * intermediate will add to when it receives a packet from a client. The synchronized queue will mean that
+ * only one of the intermediate threads can access it at once. If a packet in the queue has a destination different than
+ * the the port's assigned client, it will break. However, if the destination is for the assigned client, then the
+ * queue will dequeue and send it along.
+ */
+public class IntermediateHost extends Thread {
 
     DatagramPacket sendPacket, receivePacket;
     DatagramSocket sendSocket, receiveSocket;
 
-    public IntermediateHost(){
+    private List packetQueue = new LinkedList<DatagramPacket>();
+
+    public IntermediateHost(int port){
         try {
             // Construct a datagram socket and bind it to any available
             // port on the local host machine
             sendSocket = new DatagramSocket();
 
-            // Construct a datagram socket and bind it to port 23
+            // Construct a datagram socket and bind it to the input port
             // on the local host machine
-            receiveSocket = new DatagramSocket(23);
+            receiveSocket = new DatagramSocket(port);
 
         } catch (SocketException se) {
             se.printStackTrace();
             System.exit(1);
         }
     }
+
+
 
     /**
      * Get packet from either server or client and send to the opposite
@@ -147,12 +164,28 @@ public class IntermediateHost {
 
     }
 
-    public static void main( String args[] ) {
-        IntermediateHost intermediateHost = new IntermediateHost();
+    /**
+     * reply to server or client
+     */
+    public synchronized void rpcReply(){
 
-        //keep running infinitely
-        while(true) {
-            intermediateHost.receiveAndSend();
-        }
     }
+
+    @Override
+    public void run(){
+        while(true){
+            rpcReply();
+        }
+
+    }
+
+    public static void main(String args[]) {
+        IntermediateHost clientHost = new IntermediateHost(23);
+        IntermediateHost serverHost = new IntermediateHost(35);
+
+        clientHost.start();
+        serverHost.start();
+    }
+
+
 }
