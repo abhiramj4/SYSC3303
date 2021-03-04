@@ -25,7 +25,7 @@ public class Client {
         }
     }
 
-    public void rpcSend(Object data){}
+    public void rpcSend(){}
 
     /**
      * Send and receive packets through the sendReceiveSocket - sends to the intermediate host at port 23
@@ -137,8 +137,10 @@ public class Client {
                 System.out.println("Valid read request met");
             } else if (data[1] == 4){
                 System.out.println("Valid write request met");
+            } else if (data[1] == 5) {
+                System.out.println("Acknowledged packet");
             } else {
-                System.out.println("Error from server");
+                System.out.println("error");
             }
             System.out.println("");
         }

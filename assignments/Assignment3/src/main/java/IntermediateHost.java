@@ -16,16 +16,22 @@ import java.util.*;
  * only one of the intermediate threads can access it at once. If a packet in the queue has a destination different than
  * the the port's assigned client, it will break. However, if the destination is for the assigned client, then the
  * queue will dequeue and send it along.
+ *
+ * Note that each intermediate has a destination port, when its done sending the ack it will check the queue head to
+ * see if the packet there was sent from the server.
+ *
+ *
  */
 public class IntermediateHost extends Thread {
 
     DatagramPacket sendPacket, receivePacket;
     DatagramSocket sendSocket, receiveSocket;
     DatagramSocket sendReceiveSocket;
+
     private int port;
     private int destinationPort;
 
-    private Queue packetQueue;
+    private static Queue packetQueue;
 
     public IntermediateHost(int port, int destinationPort){
         try {
@@ -38,8 +44,6 @@ public class IntermediateHost extends Thread {
             receiveSocket = new DatagramSocket(port);
 
             sendReceiveSocket = new DatagramSocket(port);
-
-
 
             packetQueue = (Queue) Collections.synchronizedCollection(new LinkedList<DatagramPacket>());
             this.port = port;
@@ -177,7 +181,7 @@ public class IntermediateHost extends Thread {
     /**
      * reply to server or client
      */
-    public synchronized void rpcRecieve(){
+    public synchronized void rpcReceive(){
 
         byte data[] = new byte[100];
         receivePacket = new DatagramPacket(data, data.length);
@@ -198,9 +202,14 @@ public class IntermediateHost extends Thread {
         int len = receivePacket.getLength();
         System.out.println("Length: " + len);
 
+        //do something different for server, since it is the only program to make requests to teh intermediate host
+        //need to check if the receive packet is a request from
+
         packetQueue.add(receivePacket); //add packet to queue in safe method
 
-        byte ackData[] = new byte[100];
+        //byte ackData[] = new byte[100];
+        String ack = "Acknowledged";
+        byte[] ackData = ack.getBytes();
 
         sendPacket = new DatagramPacket(ackData, receivePacket.getLength(),
                 receivePacket.getAddress(), destinationPort);
@@ -219,8 +228,14 @@ public class IntermediateHost extends Thread {
 
     public synchronized void rpcSend(){
 
-        if(((DatagramPacket)packetQueue.peek()).getPort() == 8081){
-            //if the packet in the queue comes from another port it is intended for the client
+        assert packetQueue.peek() != null;
+        if(((DatagramPacket)packetQueue.peek()).getPort() != this.destinationPort){
+
+            /*
+              if the packet in the queue comes from another port it is intended for the opposite client
+              packets in the queue will only have ports from 8080 or 8081.
+             */
+
             byte data[] = new byte[100];
 
             sendPacket = new DatagramPacket(data, receivePacket.getLength(),
@@ -231,7 +246,7 @@ public class IntermediateHost extends Thread {
             } else if (data[1] == 4){
                 System.out.println("Valid write request met");
             } else {
-                System.out.println("Error from server");
+                System.out.println("Error");
             }
 
             System.out.print("as bytes: ");
@@ -268,7 +283,7 @@ public class IntermediateHost extends Thread {
     @Override
     public void run(){
         while(true){
-            rpcRecieve();
+            rpcReceive();
             rpcSend();
         }
 
