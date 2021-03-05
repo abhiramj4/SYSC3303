@@ -19,6 +19,7 @@ import java.util.Queue;
  * The server will keep attempting to get a packet from the queue but unless a packet exists, it will not succeed BUT
  * will receive an ack message. If there is a packet, then the serverClient thread can send a message to the client.
  *
+ * all ack packages are just 00, requests from the server are 55.
  */
 public class IntermediateHost extends Thread {
 

@@ -121,6 +121,8 @@ public class Client {
                 System.exit(1);
             }
 
+
+
             // Process the received datagram
             System.out.println("Client: Packet received:");
             System.out.println("From host: " + receivePacket.getAddress());
