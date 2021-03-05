@@ -20,6 +20,32 @@ import java.util.Queue;
  * will receive an ack message. If there is a packet, then the serverClient thread can send a message to the client.
  *
  * all ack packages are just 00, requests from the server are 55.
+ *
+ * IMPORTANT - ALL PACKET STRUCTURES:
+ *
+ * Client datagram packet:
+ * 0 1 (filename in binary) 0 (mode in binary) 0 - read request
+ * OR
+ * 0 2 (filename in binary) 0 (mode in binary) 0 - write request
+ *
+ * Server datagram packet:
+ * 0 3 0 1 - valid read request
+ * OR
+ * 0 4 0 0 - valid write request
+ *
+ * Intermediate packets (NOT stored in the queue):
+ * 0 5 2 - acknowledgement to either client or server
+ *
+ * 0 6 4 - no data from server or client data
+ *
+ * otherwise the packet just returns the requested data, it is not
+ * necessary to send a packet to the client or server warning about
+ * incoming data.
+ *
+ * NOTE: once either server or client recieve a packet, they will do
+ * different things depending on the first two digits of the packet data.
+ * This is how RPC is implemented in this program.
+ *
  */
 public class IntermediateHost extends Thread {
 
