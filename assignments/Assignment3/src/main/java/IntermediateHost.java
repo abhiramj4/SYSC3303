@@ -194,7 +194,10 @@ public class IntermediateHost extends Thread {
 
     @Override
     public void run(){
-        receiveAndSend();
+        while (true){
+            receiveAndSend();
+        }
+
     }
 
     public static void main( String args[] ) {

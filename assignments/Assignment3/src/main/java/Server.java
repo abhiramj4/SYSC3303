@@ -39,7 +39,7 @@ public class Server {
 
             try {
                 sendPacket = new DatagramPacket(data, data.length,
-                        InetAddress.getLocalHost(), 23);
+                        InetAddress.getLocalHost(), 32);
             } catch (UnknownHostException e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -62,14 +62,14 @@ public class Server {
                 System.exit(1);
             }
 
-            if(data[1] == 3){
+            if(data[1] == 1){
                 System.out.println("Valid read request");
                 waitForData = false;
-            } else if (data[1] == 4){
+            } else if (data[1] == 2){
                 System.out.println("Valid write request");
                 waitForData = false;
             } else {
-                // theres no data from the server yet, send another request
+                // theres no data from the server yet, send another request - this is also the ack
                 System.out.println("Can't retrieve data, trying to request again");
 
             }
@@ -78,7 +78,7 @@ public class Server {
 
         // Construct a DatagramPacket for receiving packets up
         // to 100 bytes long
-        
+
         byte[] returnMessage = new byte[4];
 
         receivePacket = new DatagramPacket(data, data.length);
@@ -192,6 +192,8 @@ public class Server {
         }
 
         System.out.println("Server: packet sent \n");
+
+        //get ackno
 
     }
 
