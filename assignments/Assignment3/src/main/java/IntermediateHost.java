@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This class now is a two way channel, it basically implements TCP but using the UDP sockets and datagrams.
@@ -28,15 +29,19 @@ import java.util.Queue;
  * OR
  * 0 2 (filename in binary) 0 (mode in binary) 0 - write request
  *
+ * 0 7 3 - request for data from intermediate
+ *
  * Server datagram packet:
  * 0 3 0 1 - valid read request
  * OR
  * 0 4 0 0 - valid write request
  *
+ * 0 8 5 - request for data from server
+ *
  * Intermediate packets (NOT stored in the queue):
  * 0 5 2 - acknowledgement to either client or server
  *
- * 0 6 4 - no data from server or client data
+ * 0 6 4 - no data for server or client data
  *
  * otherwise the packet just returns the requested data, it is not
  * necessary to send a packet to the client or server warning about
@@ -52,10 +57,11 @@ public class IntermediateHost extends Thread {
     DatagramPacket sendPacket, receivePacket;
     DatagramSocket sendSocket, receiveSocket;
 
-    private Queue packetQueue;
+    private LinkedBlockingQueue<DatagramPacket> packetQueue;
     private int destinationPort;
 
-    public IntermediateHost(Queue packetQueue, int destinationPort){
+    public IntermediateHost(LinkedBlockingQueue packetQueue, int destinationPort, int receivePort){
+
         try {
             // Construct a datagram socket and bind it to any available
             // port on the local host machine
@@ -63,7 +69,7 @@ public class IntermediateHost extends Thread {
 
             // Construct a datagram socket and bind it to port 23
             // on the local host machine
-            receiveSocket = new DatagramSocket(23);
+            receiveSocket = new DatagramSocket(receivePort);
 
             //packetQueue = (Queue) Collections.synchronizedList(new LinkedList<DatagramPacket>());
             this.packetQueue = packetQueue;
@@ -76,7 +82,26 @@ public class IntermediateHost extends Thread {
     }
 
     /**
-     * Get packet from either server or client, depending on the thread, and send to the opposite
+     * Reply with an acknowledgment always when getting a packet
+     * @param data data to reply with
+     */
+    public void reply(byte[] data){
+
+
+        sendPacket = new DatagramPacket(data, receivePacket.getLength(),
+                receivePacket.getAddress(), destinationPort); //send this acknowledgment to the client or server
+
+        try {
+            sendSocket.send(sendPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+    }
+
+    /**
+     * Get packet from either server or client, depending on the thread, and send to the destination
      */
     public void receiveAndSend() {
         // Construct a DatagramPacket for receiving packets up
@@ -105,21 +130,11 @@ public class IntermediateHost extends Thread {
         int len = receivePacket.getLength();
         System.out.println("Length: " + len);
 
-        //send back an ack package always
         byte[] ack = new byte[100];
         ack[0] = 0;
-        ack[1] = 0; //00 ack flag
-        sendPacket = new DatagramPacket(ack, receivePacket.getLength(),
-                receivePacket.getAddress(), receivePacket.getPort());
+        ack[1] = 5;
+        ack[2] = 2;
 
-        try {
-            sendSocket.send(sendPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        // Slow things down (wait 5 seconds)
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e ) {
@@ -127,117 +142,53 @@ public class IntermediateHost extends Thread {
             System.exit(1);
         }
 
-        //2 2 is a request from server - only the serverClient thread cares about this
-        if(data[0] == 2 && data[1] == 2){
-            //do not add request packages to this queue, these only come from the server
-            //break out since there's nothing to send
-            return;
-        } else {
+        reply(ack); //reply to the received packet
+
+        // Slow things down (wait 5 seconds)
+
+
+        /*
+        First if statement is receiving a packet from either client or server
+         */
+
+        if( (data[0] == 0 && data[1] == 1) || (data[0] == 0 && data[1] == 2) ){
+            //this is a package from client that wants to put into the queue
             packetQueue.add(receivePacket);
-        }
+        } else if ( (data[0] == 0 && data[1] == 7 && data [2] == 3) ||
+                (data[0] == 0 && data[1] == 8 && data [2] == 5) ){
+            //request to get the packet from the client
 
-        /*
-        Now take a look at the top packet, and send it. if we are coming from the server then this should
-         */
+            DatagramPacket packetToSend = packetQueue.remove();
 
-        try {
-            DatagramPacket packetToSend = ((DatagramPacket)(packetQueue.remove()));
+            //there is a packet to send back
+            if(packetToSend != null){
+                DatagramPacket sendPacketToDestination = new DatagramPacket(packetToSend.getData(), packetToSend.getLength(),
+                        packetToSend.getAddress(), destinationPort);
 
-            DatagramPacket sendPacketClient = new DatagramPacket(packetToSend.getData(), packetToSend.getLength(),
-                    packetToSend.getAddress(), destinationPort);
+                try {
+                    sendSocket.send(sendPacketToDestination);
 
-            sendSocket.send(sendPacketClient);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        /*
-
-        if(receivePacket.getPort() == 8080){
-            //packet came from the client and needs to go to the server
-
-            sendPacket = new DatagramPacket(data, receivePacket.getLength(),
-                    receivePacket.getAddress(), 69);
-
-            //print out what is contained
-            System.out.println("containing: ");
-
-            if(data[1] == 1){
-                System.out.println("Read request");
-            } else if (data[1] == 2){
-                System.out.println("Write request");
-            }
-
-            ByteArrayOutputStream textOutputStream = new ByteArrayOutputStream();
-
-            //convert bytes into string and read out text content
-            for(int i = 2; i < data.length; i++){
-                if(data[i] == 0){
-                    break;
-                } else {
-                    textOutputStream.write(data[i]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
                 }
-            }
-            byte[] textOutput = textOutputStream.toByteArray();
-            String textContent = new String(textOutput, StandardCharsets.UTF_8);
-            System.out.println("text content: "+ textContent);
-            textOutputStream.reset();
 
 
-            for(int i = textOutput.length + 3; i < data.length; i++){
-                if(data[i] == 0){
-                    break;
-                } else {
-                    textOutputStream.write(data[i]);
-                }
-            }
-            String mode = textOutputStream.toString(StandardCharsets.UTF_8);
-            System.out.println("Mode: " + mode);
-
-
-        }
-        else {
-            //packet came from the server and needs to go to client
-            sendPacket = new DatagramPacket(data, receivePacket.getLength(),
-                    receivePacket.getAddress(), 8080);
-
-            if(data[1] == 3){
-                System.out.println("Valid read request met");
-            } else if (data[1] == 4){
-                System.out.println("Valid write request met");
             } else {
-                System.out.println("Error from server");
+
+                //so theres no packet to send back so send back a no data reply
+
+                byte[] reply = new byte[100];
+                ack[0] = 0;
+                ack[1] = 6;
+                ack[2] = 4;
+
+                reply(reply);
             }
+
+        } else {
+
         }
-
-        System.out.print("as bytes: ");
-        for(int i = 0; i < data.length; i++){
-            System.out.print(data[i] + " ");
-        }
-
-        System.out.println(" \n");
-
-        System.out.println( "Intermediate: Sending packet:");
-        System.out.println("To host: " + sendPacket.getAddress());
-        System.out.println("Destination host port: " + sendPacket.getPort());
-        len = sendPacket.getLength();
-        System.out.println("Length: " + len);
-
-        // Send the datagram packet to the client via the send socket
-        try {
-            sendSocket.send(sendPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        System.out.println("Intermediate: packet sent");
-        System.out.println("");
-
-
-         */
-
 
     }
 
@@ -248,10 +199,13 @@ public class IntermediateHost extends Thread {
 
     public static void main( String args[] ) {
 
-        Queue packetQueue = (Queue) Collections.synchronizedList(new LinkedList<DatagramPacket>()); //shared queue
+        //shared queue
+        LinkedBlockingQueue<DatagramPacket> lbq = new LinkedBlockingQueue<DatagramPacket>();
 
-        IntermediateHost clientServer = new IntermediateHost(packetQueue,69); //channel from client to server
-        IntermediateHost serverClient = new IntermediateHost(packetQueue, 8080); //channel from server to client
+        //sending from client at 8080 to port 23 on the intermediate thread
+        IntermediateHost clientServer = new IntermediateHost(lbq,8080, 23);
+        //sending from server at 69 to 32 on second intermediate thread
+        IntermediateHost serverClient = new IntermediateHost(lbq, 69, 32);
 
         clientServer.start();
         serverClient.start();

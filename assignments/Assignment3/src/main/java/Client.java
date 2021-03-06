@@ -105,6 +105,9 @@ public class Client {
 
             System.out.println("Client: Packet sent.\n");
 
+            //so the client has now sent a packet to the intermediate responsible for client server transmission
+            //now wait for the ack package before continuing
+
 
             // Construct a DatagramPacket for receiving packets up
             // to 100 bytes long (the length of the byte array).
@@ -122,7 +125,6 @@ public class Client {
             }
 
 
-
             // Process the received datagram
             System.out.println("Client: Packet received:");
             System.out.println("From host: " + receivePacket.getAddress());
@@ -131,14 +133,71 @@ public class Client {
             System.out.println("Length: " + len);
             System.out.print("Containing: ");
 
+            //only valid responses are the valid write / read request from server OR an ack package
+
             if(data[1] == 3){
                 System.out.println("Valid read request met");
             } else if (data[1] == 4){
                 System.out.println("Valid write request met");
+            } else if (data[0] == 0 && data[1] == 5 && data[2] == 2){
+                //so this is not the valid write / read request from server, is it an ack package?
+                System.out.println("Valid ack"); //got the ack - now wait for the data placed okay from intermediate
+
+
             } else {
-                System.out.println("Error from server");
+                System.out.println("Problem? Trollface ;)");
             }
-            System.out.println("");
+
+            //now try making a request for the data
+
+            boolean waitForData = true;
+
+            while(waitForData){
+
+                //send a request for data
+                byte[] requestData = new byte[100];
+                try {
+                    sendPacket = new DatagramPacket(requestData, requestData.length,
+                            InetAddress.getLocalHost(), 23);
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                //send it
+                try {
+                    sendReceiveSocket.send(sendPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                System.out.println("Client: Packet sent.\n");
+
+                try {
+                    // Block until a datagram is received via sendReceiveSocket
+                    System.out.println("Waiting..."); // waiting
+                    sendReceiveSocket.receive(receivePacket);
+                } catch(IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                if(data[1] == 3){
+                    System.out.println("Valid read request");
+                    waitForData = false;
+                } else if (data[1] == 4){
+                    System.out.println("Valid write request");
+                    waitForData = false;
+                } else {
+                    // theres no data from the server yet, send another request
+                    System.out.println("Can't retrieve data, trying to request again");
+
+                }
+
+
+            }
+
         }
 
         //close the socket after the 14 iterations

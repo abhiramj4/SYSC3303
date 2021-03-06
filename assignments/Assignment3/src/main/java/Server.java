@@ -1,8 +1,6 @@
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 
 public class Server {
@@ -27,19 +25,61 @@ public class Server {
         }
     }
 
-    public void rpcSend(){
-
-    }
-
     /**
      * Receive and send back to intermediateHost
      */
     public void receiveAndSend() {
+
+        boolean waitForData = true;
+        byte[] data = new byte[100];
+        while(waitForData) {
+
+
+            receivePacket = new DatagramPacket(data, data.length);
+
+            try {
+                sendPacket = new DatagramPacket(data, data.length,
+                        InetAddress.getLocalHost(), 23);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+            //send it
+            try {
+                sendSocket.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+            try {
+                // Block until a datagram is received via sendReceiveSocket
+                System.out.println("Waiting..."); // waiting
+                receiveSocket.receive(receivePacket);
+            } catch(IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+            if(data[1] == 3){
+                System.out.println("Valid read request");
+                waitForData = false;
+            } else if (data[1] == 4){
+                System.out.println("Valid write request");
+                waitForData = false;
+            } else {
+                // theres no data from the server yet, send another request
+                System.out.println("Can't retrieve data, trying to request again");
+
+            }
+
+        }
+
         // Construct a DatagramPacket for receiving packets up
         // to 100 bytes long
-
-        byte data[] = new byte[100];
-        byte returnMessage[] = new byte[4];
+        
+        byte[] returnMessage = new byte[4];
 
         receivePacket = new DatagramPacket(data, data.length);
         System.out.println("Server: Waiting for Packet.");
@@ -118,7 +158,7 @@ public class Server {
         System.out.println("\n");
 
         sendPacket = new DatagramPacket(returnMessage, returnMessage.length,
-                receivePacket.getAddress(), 23);
+                receivePacket.getAddress(), 32);
 
 
         // Slow things down (wait 5 seconds)
