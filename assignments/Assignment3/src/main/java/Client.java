@@ -112,7 +112,7 @@ public class Client {
             // Construct a DatagramPacket for receiving packets up
             // to 100 bytes long (the length of the byte array).
 
-            byte data[] = new byte[100];
+            byte[] data = new byte[100];
             receivePacket = new DatagramPacket(data, data.length);
 
             try {
@@ -148,6 +148,14 @@ public class Client {
                 System.out.println("Problem? Trollface ;)");
             }
 
+            //wait for a bit here :
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e ) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+
             //now try making a request for the data
 
             boolean waitForData = true;
@@ -156,6 +164,9 @@ public class Client {
 
                 //send a request for data
                 byte[] requestData = new byte[100];
+                requestData[0] = 0;
+                requestData[1] = 7;
+                requestData[2] = 3;
                 try {
                     sendPacket = new DatagramPacket(requestData, requestData.length,
                             InetAddress.getLocalHost(), 23);
@@ -191,8 +202,16 @@ public class Client {
                     waitForData = false;
                 } else {
                     // theres no data from the server yet, send another request
-                    System.out.println("Can't retrieve data, trying to request again");
+                    System.out.println("acknowledged: But can't retrieve data, trying to request again");
 
+                }
+
+                //wait 5 before sending another request
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e ) {
+                    e.printStackTrace();
+                    System.exit(1);
                 }
 
 

@@ -144,37 +144,26 @@ public class IntermediateHost extends Thread {
 
         reply(ack); //reply to the received packet
 
-        // Slow things down (wait 5 seconds)
-
 
         /*
         First if statement is receiving a packet from either client or server
          */
-
+        DatagramPacket packetToSend = packetQueue.peek();
         if( (data[0] == 0 && data[1] == 1) || (data[0] == 0 && data[1] == 2) ){
             //this is a package from client that wants to put into the queue
             packetQueue.add(receivePacket);
-        } else if ( (data[0] == 0 && data[1] == 7 && data [2] == 3) ||
-                (data[0] == 0 && data[1] == 8 && data [2] == 5) ){
+        } else if ( (data[0] == 0 && data[1] == 7 && data [2] == 3)){
             //request to get the packet from the client
 
-            DatagramPacket packetToSend = packetQueue.remove();
 
+            assert packetToSend != null;
+            byte[] packetToSendData = packetToSend.getData();
             //there is a packet to send back
-            if(packetToSend != null){
-                DatagramPacket sendPacketToDestination = new DatagramPacket(packetToSend.getData(), packetToSend.getLength(),
-                        packetToSend.getAddress(), destinationPort);
-
-                try {
-                    sendSocket.send(sendPacketToDestination);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
 
 
-            } else {
+            //the packet that its trying to send back must be the packet from server otherwise don't do anything
+            if( packetToSendData[0] == 0 && ( packetToSendData[1] == 1||
+                    packetToSendData[1] == 2)){
 
                 //so theres no packet to send back so send back a no data reply
 
@@ -184,10 +173,57 @@ public class IntermediateHost extends Thread {
                 ack[2] = 4;
 
                 reply(reply);
+
+
+            } else { //otherwise its actually the data we want to send
+
+                DatagramPacket sendPacketToDestination = new DatagramPacket(packetToSend.getData(),
+                        packetToSend.getLength(), packetToSend.getAddress(), destinationPort);
+                packetQueue.remove();
+
+                try {
+                    sendSocket.send(sendPacketToDestination);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
 
-        } else {
+        } else if ((data[0] == 0 && data[1] == 8 && data [2] == 5)){
+            //for the server
 
+
+            if((packetToSend == null)){
+                //nothing to take or its the wrong packet
+                byte[] reply = new byte[100];
+                ack[0] = 0;
+                ack[1] = 6;
+                ack[2] = 4;
+
+                reply(reply);
+            } else if(packetToSend.getData()[0] == 0 && ( packetToSend.getData()[1] == 3 || packetToSend.getData()[1] == 4)){
+                //something to take but not the right thing
+                byte[] reply = new byte[100];
+                ack[0] = 0;
+                ack[1] = 6;
+                ack[2] = 4;
+
+                reply(reply);
+            } else { //otherwise its actually the data we want to send
+
+                DatagramPacket sendPacketToDestination = new DatagramPacket(packetToSend.getData(),
+                        packetToSend.getLength(), packetToSend.getAddress(), destinationPort);
+                packetQueue.remove();
+
+                try {
+                    sendSocket.send(sendPacketToDestination);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
         }
 
     }

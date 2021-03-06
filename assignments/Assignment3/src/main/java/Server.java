@@ -38,6 +38,10 @@ public class Server {
             receivePacket = new DatagramPacket(data, data.length);
 
             try {
+                //try and get some data
+                data[0] = 0;
+                data[1] = 8;
+                data[2] = 5;
                 sendPacket = new DatagramPacket(data, data.length,
                         InetAddress.getLocalHost(), 32);
             } catch (UnknownHostException e) {
@@ -72,6 +76,13 @@ public class Server {
                 // theres no data from the server yet, send another request - this is also the ack
                 System.out.println("Can't retrieve data, trying to request again");
 
+            }
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e ) {
+                e.printStackTrace();
+                System.exit(1);
             }
 
         }
