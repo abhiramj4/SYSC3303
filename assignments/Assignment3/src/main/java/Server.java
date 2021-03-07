@@ -67,10 +67,10 @@ public class Server {
             }
 
             if(data[1] == 1){
-                System.out.println("Valid read request");
+                System.out.println("Valid read request received");
                 waitForData = false;
             } else if (data[1] == 2){
-                System.out.println("Valid write request");
+                System.out.println("Valid write request received");
                 waitForData = false;
             } else {
                 // theres no data from the server yet, send another request - this is also the ack
@@ -92,22 +92,7 @@ public class Server {
 
         byte[] returnMessage = new byte[4];
 
-        receivePacket = new DatagramPacket(data, data.length);
-        System.out.println("Server: Waiting for Packet.");
-
-        // Block until a datagram packet is received from receiveSocket
-        try {
-            System.out.println("Waiting...\n"); // so we know we're waiting
-            receiveSocket.receive(receivePacket);
-        } catch (IOException e) {
-            System.out.print("IO Exception: likely:");
-            System.out.println("Receive Socket Timed Out.\n" + e);
-            e.printStackTrace();
-            System.exit(1);
-        }
-
         // Process the received datagram
-        System.out.println("Server: Packet received:");
         System.out.println("From host: " + receivePacket.getAddress());
         System.out.println("Host port: " + receivePacket.getPort());
         int len = receivePacket.getLength();
@@ -172,15 +157,6 @@ public class Server {
                 receivePacket.getAddress(), 32);
 
 
-        // Slow things down (wait 5 seconds)
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e ) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-
         System.out.println( "Server: Sending packet:");
         System.out.println("To host: " + sendPacket.getAddress());
         System.out.println("Destination host port: " + sendPacket.getPort());
@@ -204,7 +180,24 @@ public class Server {
 
         System.out.println("Server: packet sent \n");
 
-        //get ackno
+        //get acknowledgment
+        try {
+            // Block until a datagram is received via sendReceiveSocket
+            System.out.println("Waiting..."); // waiting
+            receiveSocket.receive(receivePacket);
+        } catch(IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+
+        // Slow things down (wait 5 seconds)
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e ) {
+            e.printStackTrace();
+            System.exit(1);
+        }
 
     }
 

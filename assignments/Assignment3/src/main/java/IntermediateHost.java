@@ -142,41 +142,48 @@ public class IntermediateHost extends Thread {
             System.exit(1);
         }
 
-        reply(ack); //reply to the received packet
+        //check if packet comes from client
+        //if yes then is it the data or a request
+        //if data then add to queue, if request then just check and return data if there is anything - and ignore
+        //if its just our own data
+        //return an ack if nothing
 
+        //check if packet comes from server
+        //if yes then is a request or data
+        //if its a request, does the queue have what we want or is it just our own data
+        //if its data, submit to queue
 
-        /*
-        First if statement is receiving a packet from either client or server
-         */
         DatagramPacket packetToSend = packetQueue.peek();
+        byte[] reply = new byte[100];
+        reply[0] = 0;
+        reply[1] = 5;
+        reply[2] = 2;
+
         if( (data[0] == 0 && data[1] == 1) || (data[0] == 0 && data[1] == 2) ){
             //this is a package from client that wants to put into the queue
             packetQueue.add(receivePacket);
+            reply(reply);
+
         } else if ( (data[0] == 0 && data[1] == 7 && data [2] == 3)){
-            //request to get the packet from the client
+            //okay so the data isn't a request to put data in, is it a request for data? - if you're here then yes!
+
+            //now is the packet in the queue for the server or the client?
+            if( packetToSend == null){
+                //well the queue is empty so there's nothing
 
 
-            assert packetToSend != null;
-            byte[] packetToSendData = packetToSend.getData();
-            //there is a packet to send back
-
-
-            //the packet that its trying to send back must be the packet from server otherwise don't do anything
-            if( packetToSendData[0] == 0 && ( packetToSendData[1] == 1||
-                    packetToSendData[1] == 2)){
-
-                //so theres no packet to send back so send back a no data reply
-
-                byte[] reply = new byte[100];
-                ack[0] = 0;
-                ack[1] = 6;
-                ack[2] = 4;
 
                 reply(reply);
+            } else if (packetToSend.getData()[0] == 0 && ( packetToSend.getData()[1] == 1||
+                    packetToSend.getData()[1] == 2)){
+                //so this is just the packet from the queue, yuck we don't want this
 
 
-            } else { //otherwise its actually the data we want to send
+                reply(reply);
+            }
 
+            else {
+                //hey! it is the data we want, awesome
                 DatagramPacket sendPacketToDestination = new DatagramPacket(packetToSend.getData(),
                         packetToSend.getLength(), packetToSend.getAddress(), destinationPort);
                 packetQueue.remove();
@@ -190,28 +197,27 @@ public class IntermediateHost extends Thread {
                 }
             }
 
-        } else if ((data[0] == 0 && data[1] == 8 && data [2] == 5)){
-            //for the server
 
+        } else if ((data[0] == 0 && data[1] == 3) || (data[0] == 0 && data[1] == 4)){
+            //okay so if you've reached this point you're from server - is the data being sent the data server wants
+            //to submit?
+            packetQueue.add(receivePacket);
+            reply(reply);
+        } else if((data[0] == 0 && data[1] == 8 && data [2] == 5)){
+            //okay so you're not the data, that means that this is a request for data
+            //lets first check if we have the data
 
-            if((packetToSend == null)){
-                //nothing to take or its the wrong packet
-                byte[] reply = new byte[100];
-                ack[0] = 0;
-                ack[1] = 6;
-                ack[2] = 4;
+            if(packetToSend == null){
+
 
                 reply(reply);
-            } else if(packetToSend.getData()[0] == 0 && ( packetToSend.getData()[1] == 3 || packetToSend.getData()[1] == 4)){
-                //something to take but not the right thing
-                byte[] reply = new byte[100];
-                ack[0] = 0;
-                ack[1] = 6;
-                ack[2] = 4;
+            } else if (packetToSend.getData()[0] == 0 && ( packetToSend.getData()[1] == 3||
+                    packetToSend.getData()[1] == 4)){
+
 
                 reply(reply);
-            } else { //otherwise its actually the data we want to send
-
+            } else {
+                //cool this is the actual data from client we wanted
                 DatagramPacket sendPacketToDestination = new DatagramPacket(packetToSend.getData(),
                         packetToSend.getLength(), packetToSend.getAddress(), destinationPort);
                 packetQueue.remove();
@@ -224,7 +230,10 @@ public class IntermediateHost extends Thread {
                     System.exit(1);
                 }
             }
+
+
         }
+
 
     }
 
