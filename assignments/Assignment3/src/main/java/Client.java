@@ -141,13 +141,10 @@ public class Client {
                 System.out.println("Valid write request met");
             } else if (data[0] == 0 && data[1] == 5 && data[2] == 2){
                 //so this is not the valid write / read request from server, is it an ack package?
-                System.out.println("Valid ack"); //got the ack - now wait for the data placed okay from intermediate
-
-
+                System.out.println("Valid acknowledgment"); //got the ack - now wait for the data placed okay from intermediate
             } else {
-                System.out.println("Problem? Trollface ;)");
+                System.out.println("Error: never should not have come here");
             }
-
             //wait for a bit here :
             try {
                 Thread.sleep(5000);
@@ -183,7 +180,7 @@ public class Client {
                     System.exit(1);
                 }
 
-                System.out.println("Client: Packet sent.\n");
+                System.out.println("Client: Request packet sent.\n");
 
                 try {
                     // Block until a datagram is received via sendReceiveSocket
@@ -195,14 +192,14 @@ public class Client {
                 }
 
                 if(data[1] == 3){
-                    System.out.println("Valid read request");
+                    System.out.println("Valid read request from server");
                     waitForData = false;
                 } else if (data[1] == 4){
-                    System.out.println("Valid write request");
+                    System.out.println("Valid write request from server");
                     waitForData = false;
                 } else {
                     // theres no data from the server yet, send another request
-                    System.out.println("acknowledged: But can't retrieve data, trying to request again");
+                    System.out.println("Acknowledged: But can't retrieve data, trying to request again");
 
                 }
 
@@ -213,10 +210,7 @@ public class Client {
                     e.printStackTrace();
                     System.exit(1);
                 }
-
-
             }
-
         }
 
         //close the socket after the 14 iterations

@@ -55,9 +55,15 @@ public class IntermediateHost extends Thread {
     DatagramPacket sendPacket, receivePacket;
     DatagramSocket sendSocket, receiveSocket;
 
-    private LinkedBlockingQueue<DatagramPacket> packetQueue;
+    private LinkedBlockingQueue<DatagramPacket> packetQueue; //this is important to synchronize the two threads
     private int destinationPort;
 
+    /**
+     * Constructor for the client and server intermediate
+     * @param packetQueue shared packet queue between all threads
+     * @param destinationPort destination port of this thread
+     * @param receivePort reception port of this thread
+     */
     public IntermediateHost(LinkedBlockingQueue packetQueue, int destinationPort, int receivePort){
 
         try {
@@ -163,28 +169,25 @@ public class IntermediateHost extends Thread {
             reply(reply);
 
         } else if ( (data[0] == 0 && data[1] == 7 && data [2] == 3)){
-            //okay so the data isn't a request to put data in, is it a request for data? - if you're here then yes!
+            //The data isn't a request to put data in, is it a request for data? - if you're here then yes
 
             //now is the packet in the queue for the server or the client?
             if( packetToSend == null){
                 //well the queue is empty so there's nothing
-
-
-
                 reply(reply);
+
             } else if (packetToSend.getData()[0] == 0 && ( packetToSend.getData()[1] == 1||
                     packetToSend.getData()[1] == 2)){
-                //so this is just the packet from the queue, yuck we don't want this
-
+                //so this is just the packet from the queue, we don't want this
 
                 reply(reply);
             }
 
             else {
-                //hey! it is the data we want, awesome
+                //This is the data we want, good
                 DatagramPacket sendPacketToDestination = new DatagramPacket(packetToSend.getData(),
                         packetToSend.getLength(), packetToSend.getAddress(), destinationPort);
-                packetQueue.remove();
+                packetQueue.remove(); //remove and send
 
                 try {
                     sendSocket.send(sendPacketToDestination);
@@ -237,6 +240,8 @@ public class IntermediateHost extends Thread {
 
     @Override
     public void run(){
+
+        //program continues indefinitely
         while (true){
             receiveAndSend();
         }

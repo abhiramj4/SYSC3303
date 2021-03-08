@@ -9,6 +9,7 @@ public class Server {
     DatagramSocket sendSocket, receiveSocket;
 
 
+    //the server behaves in the reverse order of the client, sending requests first then pushing to the intermediate
     public Server() {
         try {
             // Construct a datagram socket and bind it to any available
@@ -34,9 +35,7 @@ public class Server {
         byte[] data = new byte[100];
         while(waitForData) {
 
-
             receivePacket = new DatagramPacket(data, data.length);
-
             try {
                 //try and get some data
                 data[0] = 0;
@@ -48,7 +47,6 @@ public class Server {
                 e.printStackTrace();
                 System.exit(1);
             }
-
             //send it
             try {
                 sendSocket.send(sendPacket);
@@ -183,7 +181,7 @@ public class Server {
         //get acknowledgment
         try {
             // Block until a datagram is received via sendReceiveSocket
-            System.out.println("Waiting..."); // waiting
+            System.out.println("Waiting for acknowledgment..."); // waiting
             receiveSocket.receive(receivePacket);
         } catch(IOException e) {
             e.printStackTrace();
